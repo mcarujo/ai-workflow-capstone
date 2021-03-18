@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mt-5">Quick traning reporting...</h1> 
+
+<h4>Traning Results.</h4>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for metric in metrics %}
+                <tr>
+                    <td>{{ metric[0] }}</td>
+                    <td>{{ metric[1] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+{% endblock %}

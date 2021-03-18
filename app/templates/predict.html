@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mt-5">On this page we can see the prediction returned by the Prophet Model </h1> 
+
+<h4>Returning predictions for the next {{days}} days.</h4>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Data</th>
+        <th scope="col">Trend</th>
+        <th scope="col">Value</th>
+        <th scope="col">Min Value</th>
+        <th scope="col">Max Value</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for prediction in predictions %}
+            <tr>
+                <td>{{ prediction['ds'].split('T')[0]}}</td>
+                <td>{{ prediction['trend'] }}</td>
+                <td>{{ prediction['yhat'] }}</td>
+                <td>{{ prediction['yhat_lower'] }}</td>
+                <td>{{ prediction['yhat_upper'] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
