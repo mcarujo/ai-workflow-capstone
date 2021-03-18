@@ -2,7 +2,8 @@
 Application to deploy a time series forecast.
 
 ## Introduction
-Here I tried to develop a project simple but effective in terms of training, prediction and monitoring. The model train with the data already in CSV, that means that I'm expecting an ETL that get the data from a raw format and then transform into CSV, this process was made by me in the notebooks. For predictions I'm expecting how much days ahead the user would like to see. In the end, will be provided with a screen to analyze the model performance and historical logs.
+Here I tried to develop a project simple but effective in terms of training, prediction and monitoring. The model trains with the data already in CSV, which means that I'm expecting an ETL that get the data from a raw format and then transform it into CSV, this process was made by me in the notebooks. For predictions I'm expecting how much days ahead the user would like to see. In the end, will be provided with a screen to analyze the model performance and historical logs.
+
 
 ## which technologies/frameworks I used??
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/)
