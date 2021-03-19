@@ -17,8 +17,8 @@ class TestStringMethods(unittest.TestCase):
     def test_model_train(self):
         dp = DataProcessing()
         dataset = dp.get_dataframe_to_train()
-        model_predict = ModelPredict(dataset)
-        self.assertEqual(model_predict.predict(10)[0], 10)
+        model_predict = ModelPredict()
+        self.assertEqual(model_predict.predict(10).shape[0], 10)
 
 
 if __name__ == '__main__':
