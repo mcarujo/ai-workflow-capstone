@@ -18,3 +18,4 @@ Here I tried to develop a project simple but effective in terms of training, pre
 - **app.py** the Flask file where contains the API configuration, routes, etc.
 - **data_processing.py** the file contains the class DataProcessing responsible to process the dataset.
 - **model.py** the file contains to classes ModelPredict and ModelTrain responsible to predict and train the Prophet model. 
+- **test.py** the test file which contains unit-test for machine learning classes.
