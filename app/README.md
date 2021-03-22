@@ -20,3 +20,4 @@ Here I tried to develop a project simple but effective in terms of training, pre
 - **data_processing.py** the file contains the class DataProcessing responsible to process the dataset.
 - **model.py** the file contains to classes ModelPredict and ModelTrain responsible to predict and train the Prophet model. 
 - **test.py** the test file which contains unit-test for machine learning classes.
+- **logs.txt** log file as format txt.
