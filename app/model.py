@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import joblib
+import logging
 import os
+
+import joblib
 import numpy as np
 import pandas as pd
 from fbprophet import Prophet
@@ -18,16 +20,20 @@ class ModelTrain:
         """
             Load the time series from a csv then Impute, Transform and Clean.
         """
+        logging.info('Process Dataset.')
         dataset = self.dataset
+        logging.info('Removing outliers.')
         dataset = dataset[dataset.Final_price > 0]
         dataset = dataset[dataset.Final_price <
                           dataset.Final_price.quantile(0.98)]
+        logging.info('Transforming date column.')
         dataset.date = pd.to_datetime(dataset.date)
         full_dates = pd.DataFrame(
             pd.date_range(start=dataset.date.min(), end=dataset.date.max()), columns=["date"]
         )
         dataset = dataset.set_index("date").join(
             full_dates.set_index("date"), how='right')
+        logging.info('Imputing missing.')
         dataset["Final_price"].interpolate(method="linear", inplace=True)
         dataset["Final_times_viewed"].interpolate(
             method="linear", inplace=True)
@@ -37,6 +43,7 @@ class ModelTrain:
         """
             Adapt the Time Series DataFrame to Prophet DataFrame.
         """
+        logging.info('Formating to prophet.')
         aux = pd.DataFrame()
         aux["ds"] = serie_ds
         aux["y"] = serie_y
@@ -54,6 +61,7 @@ class ModelTrain:
         """
             This function will be responsible to get the data and the model parameters, train and then return the metrics for evaluation.
         """
+        logging.info(f'Starting a training process for {periods}.')
         model = Prophet(
             yearly_seasonality=yearly_seasonality,
             changepoint_range=changepoint_range,
@@ -69,21 +77,20 @@ class ModelTrain:
         r2 = round(r2_score(data["y"], forecast["yhat"]), 3)
         mse = round(mean_squared_error(data["y"], forecast["yhat"]), 3)
         mae = round(mean_absolute_error(data["y"], forecast["yhat"]), 3)
-
+        logging.info(
+            f'Finished training with results: R2 - {r2} | MSE - {mse} | MAE - {mae}.')
         # Only train
         if train:
-            print("R2: ", r2)
-            print("MSE: ", mse)
-            print("MAE: ", mae)
             return model, [r2, mse, mae]
         # Tuning
         else:
             return {"CPS": cps, "R2": r2, "MSE": mse, "MAE": mae}
 
-    def tunning_model(self, data):
+    def tuning_model(self, data):
         """
             This is a Tunning Model will get the data, tuning the model and then train the model with the best parameters. 
         """
+        logging.info(f'Starting tuning model.')
         data_prophet = self.format_to_prophet(
             data.reset_index().date, data.reset_index().Final_times_viewed
         )
@@ -105,6 +112,8 @@ class ModelTrain:
         results = pd.DataFrame(results)
         results = results[results.R2.isin([max(results.R2)])]
         results = results[results.MSE.isin([min(results.MSE)])]
+        logging.info(
+            f'Finished tuning with results: R2 - {results.R2} | MSE - {results.MSE}.')
         return self.train_predict(
             data=data_prophet,
             periods=30,
@@ -115,12 +124,15 @@ class ModelTrain:
         )
 
     def save_joblib(self, model, path):
+        logging.info(f'Saving model into {path}.')
         joblib.dump(model, path)
 
     def run(self):
+        logging.info(f'Runing the train process.')
         data_ts = self.process_dataset()
-        model, metrics = self.tunning_model(data_ts)
+        model, metrics = self.tuning_model(data_ts)
         self.save_joblib(model, 'model/prophet.joblib')
+        logging.info(f'Finishing the train process.')
         return model, metrics
 
 
@@ -129,9 +141,11 @@ class ModelPredict:
         self.model = joblib.load(os.path.join('model', 'prophet.joblib'))
 
     def load_joblib(self, path):
+        logging.info(f'Loading Prophet model.')
         return joblib.load(path)
 
     def predict(self, days):
+        logging.info(f'Predicting the next {days} days.')
         future = self.model.make_future_dataframe(
             periods=days, freq='D', include_history=False
         )

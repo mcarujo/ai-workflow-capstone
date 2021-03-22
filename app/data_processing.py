@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import logging
 import os
 import re
 
@@ -24,11 +25,11 @@ class DataProcessing:
         """
             Load all files, concat them and then transform as DataFrame.
         """
-        print('Loading all json"s...')
+        logging.info('Loading all json"s...')
         dfs = list()
         files = os.listdir(self.DATA_DIR)
         for file in files:
-            print('Reading the file:', file)
+            logging.info(f'Reading the file: {file}')
             dfs.append(pd.read_json(os.path.join(
                 self.DATA_DIR, file), orient="records"))
         return pd.concat(dfs).fillna(np.nan)
@@ -37,7 +38,7 @@ class DataProcessing:
         """
             Droping unnescessary columns in the DataFrame.
         """
-        print('Dropping columns...')
+        logging.info('Dropping columns.')
         return dataframe.drop(self.unused_columns, axis=1)
 
     def remove_non_numerical(self, string):
@@ -50,7 +51,7 @@ class DataProcessing:
         """
             Feature Engeering step, transforming cleaning features.
         """
-        print('Transforming features...')
+        logging.info('Transforming features.')
         total_price_cleaned = dataframe[
             (dataframe["total_price"] <
              dataframe["total_price"].quantile(0.99))
@@ -86,12 +87,13 @@ class DataProcessing:
         """
             Transform our dataset in a time series.
         """
-        print('Creating time series...')
+        logging.info('Creating time series.')
         time_serie = dataframe.groupby("date").sum().reset_index()
         return time_serie
 
     def get_dataframe_to_train(self):
         # Data Processing
+        logging.info('Geting datafram to train.')
         data_set = self.load_all_json_by_dir()
         data_set_transformed = self.transforming_columns(data_set)
         data_set_cleaned = self.dropping_unnescessary_columns(
@@ -99,10 +101,12 @@ class DataProcessing:
         data_set_time_series = self.create_timeseries(data_set_cleaned)
 
         # Saving Dataset Regression
+        logging.info('Saving Dataset Regression.')
         data_set_cleaned.to_csv(os.path.join(
             self.DATA_OUT, 'data_set.csv'), index=False)
 
         # Saving Dataset Time Series
+        logging.info('Saving Dataset Time Series.')
         data_set_time_series.to_csv(os.path.join(
             self.DATA_OUT, 'data_set_time_series.csv'), index=False)
 
